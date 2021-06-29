@@ -47,13 +47,11 @@ class Counter(commands.Cog):
     async def on_guild_join(self, guild):
         if not guild.id in self.bot.config.counted_guilds:
             return
-        channels = list(
-            filter(
-                lambda c: c.permissions_for(guild.me).send_messages
-                and ("commands", "bot", "general") in channel.name,
-                guild.text_channels,
-            )
-        )
+        channels = [
+            channel
+            for channel in guild.text_channels
+            if channel.permissions_for(guild.me).send_messages and ("commands" in channel.name or "bot" in channel.name or "general" in channel.name)
+        ]
         content = "Thank you for adding me to this server!\n\nI am a bot made to track user activity."
         if not all(
             [
@@ -66,7 +64,7 @@ class Counter(commands.Cog):
                 "\n\nI have noticed that the roles are not yet set up. Please create a role named Level 1, Level 2 and Level 3 to continue using the bot!"
                 "Else the bot will not be able to assign roles in the future. Also make sure to move the bot's role above them so it will have permission to assign them in the future."
             )
-        content += f"\n\nOnce everything else is done, make sure to run `{ctx.prefix}init` as the owner to intialize the counter."
+        content += f"\n\nOnce everything else is done, make sure to run `{self.bot.config.prefix}init` as the owner to intialize the counter."
         embed = Embed(
             title=f"Welcome {guild.name}!", description=content, color=0x39FF14
         )
