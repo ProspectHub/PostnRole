@@ -5,7 +5,7 @@ from io import StringIO
 from time import time
 
 from discord import Embed, File, Member
-from discord.errors import Forbidden
+from discord.errors import Forbidden, NotFound
 from discord.ext import commands, tasks
 from discord.utils import get as discord_get
 from pytz import utc
@@ -282,7 +282,10 @@ class Counter(commands.Cog):
                 username = ctx.guild.get_member(user_id)
                 joined_at = username.joined_at.astimezone(utc)
             else:
-                username = await self.bot.fetch_user(user_id)
+                try:
+                    username = await self.bot.fetch_user(user_id)
+                except NotFound:
+                    username = "Deleted User"
                 joined_at = ""
             writer.writerow(
                 {
