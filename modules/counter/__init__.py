@@ -282,7 +282,7 @@ class Counter(commands.Cog):
                 username = ctx.guild.get_member(user_id)
                 joined_at = username.joined_at.astimezone(utc)
             else:
-                username = self.bot.fetch_user(user_id)
+                username = await self.bot.fetch_user(user_id)
                 joined_at = ""
             writer.writerow(
                 {
