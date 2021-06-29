@@ -50,7 +50,12 @@ class Counter(commands.Cog):
         channels = [
             channel
             for channel in guild.text_channels
-            if channel.permissions_for(guild.me).send_messages and ("commands" in channel.name or "bot" in channel.name or "general" in channel.name)
+            if channel.permissions_for(guild.me).send_messages
+            and (
+                "commands" in channel.name
+                or "bot" in channel.name
+                or "general" in channel.name
+            )
         ]
         content = "Thank you for adding me to this server!\n\nI am a bot made to track user activity."
         if not all(
@@ -178,7 +183,9 @@ class Counter(commands.Cog):
             and channel.permissions_for(ctx.guild.me).read_message_history
         ]
         confirmation_message = await ctx.send(
-            f"The bot could start the logging in {len(logged_channels)} channels. Is that what you want?"
+            f"The bot could start the logging in {len(logged_channels)} channels. Is that what you want?",
+            reference=ctx.message,
+            mention_author=False,
         )
 
         await confirmation_message.add_reaction("✅")
@@ -244,7 +251,11 @@ class Counter(commands.Cog):
             )
 
         await confirmation_message.delete()
-        await ctx.send("The initialization has been finished!")
+        await ctx.send(
+            "The initialization has been finished!",
+            reference=ctx.message,
+            mention_author=True,
+        )
         self.bulk_count_update.start()
 
     @is_guild_owner()
@@ -279,6 +290,8 @@ class Counter(commands.Cog):
         await ctx.send(
             "Find the table attached below!",
             file=File(filename=f"userdata_{int(time())}.csv", fp=output),
+            reference=ctx.message,
+            mention_author=False,
         )
         output.close()
 
@@ -310,7 +323,7 @@ class Counter(commands.Cog):
         embed.set_footer(
             text="Joined:", icon_url=member.avatar_url_as(static_format="png", size=256)
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, reference=ctx.message, mention_author=False)
 
 
 def setup(bot):
