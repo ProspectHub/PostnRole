@@ -108,6 +108,9 @@ class Counter(commands.Cog):
     async def check_level_up(self, member, new_message_count: int):
         async def _add_role(member, name: str):
             try:
+                level_roles = [role for role in member.roles if "Level" in role.name]
+                if level_roles:
+                    await member.remove_roles(*level_roles, reason="Auto levelup role")
                 await member.add_roles(
                     discord_get(member.guild.roles, name=name),
                     reason="Auto levelup role",
