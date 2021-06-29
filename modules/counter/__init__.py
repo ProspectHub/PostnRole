@@ -124,20 +124,20 @@ class Counter(commands.Cog):
         if not member:
             return
         user_active_since = (datetime.now() - member.joined_at).days
-        if not discord_get(member.roles, name="Level 1") and new_message_count >= 12:
-            await _add_role(member, "Level 1")
-        if (
-            not discord_get(member.roles, name="Level 2")
-            and user_active_since > 7 * 6
-            and new_message_count >= 48
-        ):
-            await _add_role(member, "Level 2")
         if (
             not discord_get(member.roles, name="Level 3")
             and user_active_since > 7 * 12
             and new_message_count >= 100
         ):
-            await _add_role(member, "Level 3")
+            return await _add_role(member, "Level 3")
+        elif (
+            not discord_get(member.roles, name="Level 2")
+            and user_active_since > 7 * 6
+            and new_message_count >= 48
+        ):
+            return await _add_role(member, "Level 2")
+        elif not discord_get(member.roles, name="Level 1") and new_message_count >= 12:
+            return await _add_role(member, "Level 1")
 
     @tasks.loop(seconds=30.0)
     async def bulk_count_update(self):
