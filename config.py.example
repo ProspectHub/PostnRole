@@ -1,0 +1,5 @@
+token = ""
+prefix = "."
+modules = ["owner", "help", "error_handler", "database", "counter"]
+db_creds = {"user": "username", "password": "verysecure", "database": "databasename", "host": "127.0.0.1", "port": 5432}
+counted_guilds = []
