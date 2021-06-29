@@ -227,7 +227,9 @@ class Counter(commands.Cog):
                 else:
                     user_message_count[message.author.id] = 1
 
-        for user_id, message_count in user_message_count:
+        await confirmation_message.edit(content="Messages counted! Saving....")
+
+        for user_id, message_count in user_message_count.items():
             if await self.bot.db.pool.fetchval(
                 "SELECT message_count FROM message_count WHERE guild_id=$1 AND user_id=$2",
                 ctx.guild.id,
@@ -276,13 +278,17 @@ class Counter(commands.Cog):
         )
         writer.writeheader()
         for user_id, message_count in values:
+            if ctx.guild.get_member(user_id):
+                username = ctx.guild.get_member(user_id)
+                joined_at = username.joined_at.astimezone(utc)
+            else:
+                username = self.bot.fetch_user(user_id)
+                joined_at = ""
             writer.writerow(
                 {
                     "user_id": user_id,
-                    "username": self.bot.get_user(user_id),
-                    "joined_at": ctx.guild.get_member(user_id).joined_at.astimezone(
-                        utc
-                    ),
+                    "username": username,
+                    "joined_at": joined_at,
                     "message_count": message_count,
                 }
             )
