@@ -121,7 +121,8 @@ class Counter(commands.Cog):
                     await bot_log.send(
                         f"Couldn't level up member `{member}` due to missing permissions to {name}"
                     )
-
+        if not member:
+            return
         user_active_since = (datetime.now() - member.joined_at).days
         if not discord_get(member.roles, name="Level 1") and new_message_count >= 12:
             await _add_role(member, "Level 1")
