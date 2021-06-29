@@ -44,6 +44,44 @@ class Counter(commands.Cog):
         self.bot.logger.info("The counter cog has been loaded.")
 
     @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        if not guild.id in self.bot.config.counted_guilds:
+            return
+        channels = list(
+            filter(
+                lambda c: c.permissions_for(guild.me).send_messages
+                and ("commands", "bot", "general") in channel.name,
+                guild.text_channels,
+            )
+        )
+        content = "Thank you for adding me to this server!\n\nI am a bot made to track user activity."
+        if not all(
+            [
+                discord_get(guild.roles, name="Level 1"),
+                discord_get(guild.roles, name="Level 2"),
+                discord_get(guild.roles, name="Level 3"),
+            ]
+        ):
+            content += (
+                "\n\nI have noticed that the roles are not yet set up. Please create a role named Level 1, Level 2 and Level 3 to continue using the bot!"
+                "Else the bot will not be able to assign roles in the future. Also make sure to move the bot's role above them so it will have permission to assign them in the future."
+            )
+        content += f"\n\nOnce everything else is done, make sure to run `{ctx.prefix}init` as the owner to intialize the counter."
+        embed = Embed(
+            title=f"Welcome {guild.name}!", description=content, color=0x39FF14
+        )
+        for channel in channels:
+            try:
+                await channel.send(content=guild.owner.mention, embed=embed)
+                return
+            except:
+                continue
+        try:
+            await guild.owner.send(embed=embed)
+        except:
+            await guild.leave()
+
+    @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
@@ -138,7 +176,7 @@ class Counter(commands.Cog):
         logged_channels = [
             channel
             for channel in ctx.guild.text_channels
-            if channel.permissions_for(ctx.guild.me).read_messages == True
+            if channel.permissions_for(ctx.guild.me).read_messages
             and channel.permissions_for(ctx.guild.me).read_message_history
         ]
         confirmation_message = await ctx.send(
